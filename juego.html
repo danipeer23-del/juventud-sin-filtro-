@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una decisión puede cambiar tu historia - Juventud Sin Filtro</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Estilos generales */
+        .navbar {
+            background: rgba(15, 12, 41, 0.95) !important;
+            border-bottom: 2px solid #6366f1;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Contenedor principal del juego */
+        .game-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -50px;
+            left: -50px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .game-container::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -100px;
+            right: -100px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+            }
+            50% {
+                transform: translateY(20px) translateX(20px);
+            }
+        }
+
+        /* Tarjeta del juego */
+        .game-card {
+            background: rgba(30, 27, 75, 0.8);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 
+                        0 0 40px rgba(99, 102, 241, 0.2);
+            backdrop-filter: blur(10px);
+            animation: slideInUp 0.8s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pantalla de inicio */
+        #inicio {
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            animation: titleGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            }
+            50% {
+                text-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+            }
+        }
+
+        .game-subtitle {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .intro-text {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 50px;
+            line-height: 1.8;
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid #6366f1;
+            border-radius: 8px;
+        }
+
+        /* Contenedor de historia */
+        #historia {
+            display: none;
+        }
+
+        .story-section {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .story-text {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(167, 139, 250, 0.1));
+            border-radius: 12px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            padding: 18px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid #6366f1;
+            background: transparent;
+            color: #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .choice-btn:hover {
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5),
+                        inset 0 0 20px rgba(99, 102, 241, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .choice-btn:hover::before {
+            left: 0;
+        }
+
+        .choice-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Pantalla de final */
+        #final {
+            display: none;
+            text-align: center;
+        }
+
+        .final-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .final-positive {
+            color: #10b981;
+            border-left-color: #10b981;
+        }
+
+        .final-negative {
+            color: #ef4444;
+            border-left-color: #ef4444;
+        }
+
+        .final-content {
+            background: rgba(99, 102, 241, 0.05);
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid #6366f1;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .final-text {
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .final-message {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .positive-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            color: #10b981;
+        }
+
+        .negative-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .warning-message {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid #f59e0b;
+            color: #fbbf24;
+        }
+
+        .help-section {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .help-section h4 {
+            color: #3b82f6;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .help-section p {
+            color: #cbd5e1;
+            margin: 0;
+        }
+
+        .help-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .help-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        /* Botones de acción */
+        .btn-play {
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            border: none;
+            color: white;
+            padding: 15px 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-play:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+            color: white;
+        }
+
+        .btn-play:active {
+            transform: translateY(-2px);
+        }
+
+        .btn-replay {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-replay:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+            color: white;
+        }
+
+        .btn-replay:active {
+            transform: translateY(-2px);
+        }
+
+        /* Indicador de progreso */
+        .progress-indicator {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .progress-dot.active {
+            background: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+            transform: scale(1.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                padding: 30px 20px;
+            }
+
+            .game-title {
+                font-size: 1.8rem;
+            }
+
+            .story-text {
+                font-size: 1rem;
+                padding: 20px;
+            }
+
+            .choice-btn {
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+
+            .final-title {
+                font-size: 1.5rem;
+            }
+
+            .intro-text {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Efectos de sonido visual (animación) */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        /* Footer */
+        .footer-game {
+            background: rgba(15, 12, 41, 0.95);
+            border-top: 2px solid #6366f1;
+            padding: 30px 20px;
+            margin-top: 50px;
+            text-align: center;
+            color: #a0aec0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-game a {
+            color: #6366f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-game a:hover {
+            color: #a78bfa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                🎮 Juventud Sin Filtro
+            </a>
+            <span class="text-muted">Una decisión puede cambiar tu historia</span>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal del juego -->
+    <div class="game-container">
+        <div class="game-card">
+            <!-- Pantalla de Inicio -->
+            <div id="inicio" class="story-section">
+                <h1 class="game-title">Una decisión puede cambiar tu historia</h1>
+                <p class="game-subtitle">Un viaje interactivo sobre decisiones y consecuencias</p>
+                
+                <div class="intro-text">
+                    <p>Este juego narrativo te presenta situaciones reales que muchos jóvenes enfrentan.</p>
+                    <p><strong>Tus decisiones importan.</strong> Cada elección que hagas determinará tu camino y sus consecuencias.</p>
+                    <p>¿Estás listo para descubrir cómo una sola decisión puede cambiar tu historia?</p>
+                </div>
+
+                <button class="btn-play" onclick="comenzarJuego()">Comenzar Juego</button>
+            </div>
+
+            <!-- Pantalla de Historia -->
+            <div id="historia" class="story-section">
+                <div class="progress-indicator" id="progressIndicator"></div>
+                <div id="storyContent"></div>
+            </div>
+
+            <!-- Pantalla de Final -->
+            <div id="final" class="story-section">
+                <div id="finalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-game">
+        <p>Proyecto educativo - <strong>Juventud Sin Filtro</strong> | Porque tus decisiones definen tu futuro</p>
+        <p style="font-size: 0.9rem; margin-top: 10px;">
+            Si necesitas ayuda o información, <a href="https://www.gob.mx/inmorflora" target="_blank">consulta recursos confiables</a>
+        </p>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script del Juego -->
+    <script>
+        // Estado del juego
+        let estadoJuego = {
+            fase: 'inicio',
+            decision1: null,
+            decision2: null
+        };
+
+        // Historias y decisiones
+        const juego = {
+            inicio: {
+                texto: "Es viernes por la noche y tus amigos te invitan a una fiesta.",
+                opciones: [
+                    { texto: "🎉 Ir a la fiesta", accion: 'irFiesta' },
+                    { texto: "🏠 Quedarte en casa", accion: 'quedarseEnCasa' }
+                ]
+            },
+            fiesta: {
+                texto: "Ya estás en la fiesta. La música está fuerte, hay mucha gente y la diversión parece garantizada. De repente, un desconocido se acerca y te ofrece una droga sintética.",
+                opciones: [
+                    { texto: "❌ Rechazar firmemente", accion: 'rechazarDroga' },
+                    { texto: "✋ Aceptar la oferta", accion: 'aceptarDroga' }
+                ]
+            }
+        };
+
+        // Finales
+        const finales = {
+            finalPositivoFiesta: {
+                titulo: "¡Tomaste la decisión correcta!",
+                tipo: 'positivo',
+                contenido: `
+                    <div class="final-content">
+                        <h3 style="color: #10b981; margin-bottom: 20px;">✓ Final Positivo</h3>
+                        
+                        <div class="final-text">
+                            <p>Rechazaste la oferta con seguridad y convicción. Tus amigos respetaron tu decisión, e incluso algunos se sintieron inspirados por tu firmeza.</p>
+                            
+                            <p style="margin-top: 15px;">Continuaste disfrutando la noche de una manera sana y responsable. Al día siguiente, te despertaste sintiéndote bien contigo mismo, sin arrepentimientos ni consecuencias negativas.</p>
+                            
+                            <p style="margin-top: 15px;"><strong>Lo que aprendiste:</strong> Tu bienestar es más importante que cualquier presión social. Decir "no" es un acto de valentía y autoprotección.</p>
+                        </div>
+                        
+                        <div class="final-message positive-message">
+                            <p>🌟 <strong>Tu decisión fortaleció tu autoestima y tus principios.</strong> Protegiste tu salud física y mental.</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h4>💡 Recuerda:</h4>
+                            <p>Cuando enfrentes presión para consumir sustancias, tienes derecho a:</p>
+                            <ul style="color: #cbd5e1; margin-top: 10px;">
+                                <li>Decir "no" sin necesidad de justificaciones</li>
+                                <li>Alejarte de situaciones que te hagan sentir incómodo</li>
+                                <li>Buscar amigos que respeten tus decisiones</li>
+                                <li>Hablar con adultos de confianza si necesitas apoyo</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            finalNegativoFiesta: {
+                titulo: "Las consecuencias de tu decisión",
+                tipo: 'negativo',
+                contenido: `
+                    <div class="final-content">
+                        <h3 style="color: #ef4444; margin-bottom: 20px;">⚠ Final Negativo</h3>
+                        
+                        <div class="final-text">
+                            <p>Aceptaste la droga sintética. Al principio, los efectos te parecieron interesantes, pero rápidamente las cosas se salieron de control.</p>
+                            
+                            <p style="margin-top: 15px;"><strong>Consecuencias inmediatas:</strong> Mareos, aceleración del corazón, ansiedad extrema y pánico.</p>
+                            
+                            <p style="margin-top: 15px;"><strong>A largo plazo:</strong> Riesgo de adicción, daño neurológico, problemas de salud mental, afectación en el desempeño académico y laboral.</p>
+                        </div>
+                        
+                        <div class="final-message negative-message">
+                            <p>⚠ <strong>Una decisión impulsiva puede tener consecuencias duraderas en tu vida.</strong></p>
+                        </div>
+                        
+                        <div class="warning-message" style="margin-top: 20px;">
+                            <p><strong>Las drogas sintéticas son especialmente peligrosas porque:</strong></p>
+                            <ul style="margin-top: 10px; color: #fbbf24;">
+                                <li>Su composición cambia constantemente</li>
+                                <li>No hay forma de saber qué contienen exactamente</li>
+                                <li>Pueden causar reacciones impredecibles y graves</li>
+                                <li>Tienen un alto potencial adictivo</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h4>🆘 Si necesitas ayuda:</h4>
+                            <p>Si tú o alguien que conoces enfrenta problemas con drogas, hay recursos disponibles:</p>
+                            <ul style="color: #cbd5e1; margin-top: 10px;">
+                                <li><strong>Línea de Crisis:</strong> Busca en tu país números de emergencia</li>
+                                <li><strong>Centros de Salud:</strong> Ofrecen asesoramiento gratuito y confidencial</li>
+                                <li><strong>Familiares de confianza:</strong> No temas hablar con ellos</li>
+                                <li><strong>Profesionales de salud mental:</strong> Psicólogos y psiquiatras especializados</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            finalCasa: {
+                titulo: "¡Una noche diferente pero especial!",
+                tipo: 'positivo',
+                contenido: `
+                    <div class="final-content">
+                        <h3 style="color: #10b981; margin-bottom: 20px;">✓ Final Alternativo Positivo</h3>
+                        
+                        <div class="final-text">
+                            <p>Decidiste quedarte en casa. Al principio dudaste, pero pronto te diste cuenta de que podías disfrutar una noche increíble sin necesidad de una fiesta.</p>
+                            
+                            <p style="margin-top: 15px;">Pasaste tiempo haciendo actividades que te encantan: viste una serie que querías ver, jugaste videojuegos, leíste, creaste arte o simplemente descansaste. También pasaste tiempo de calidad con tu familia.</p>
+                            
+                            <p style="margin-top: 15px;">Te despertaste el sábado sintiéndote renovado, con energía y sin ningún remordimiento. Tomaste tu propia decisión y eso te hizo sentir empoderado.</p>
+                        </div>
+                        
+                        <div class="final-message positive-message">
+                            <p>🌟 <strong>Aprendiste que el verdadero entretenimiento no necesita poner en riesgo tu salud.</strong> Tú marcas tu propio camino.</p>
+                        </div>
+                        
+                        <div class="help-section">
+                            <h4>💡 Beneficios de tu decisión:</h4>
+                            <ul style="color: #cbd5e1;">
+                                <li>✓ Mejor descanso y recuperación física</li>
+                                <li>✓ Tiempo para actividades que disfrutes</li>
+                                <li>✓ Desarrollo de intereses personales</li>
+                                <li>✓ Fortalecimiento de tu autoestima</li>
+                                <li>✓ Libertad de ser tú mismo sin presiones</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Funciones del juego
+        function comenzarJuego() {
+            estadoJuego.fase = 'historia1';
+            mostrarHistoria(juego.inicio, true);
+        }
+
+        function irFiesta() {
+            estadoJuego.decision1 = 'fiesta';
+            estadoJuego.fase = 'historia2';
+            mostrarHistoria(juego.fiesta, false);
+        }
+
+        function quedarseEnCasa() {
+            estadoJuego.decision1 = 'casa';
+            mostrarFinal(finales.finalCasa);
+        }
+
+        function aceptarDroga() {
+            estadoJuego.decision2 = 'aceptar';
+            mostrarFinal(finales.finalNegativoFiesta);
+        }
+
+        function rechazarDroga() {
+            estadoJuego.decision2 = 'rechazar';
+            mostrarFinal(finales.finalPositivoFiesta);
+        }
+
+        function mostrarHistoria(contenido, esInicio = false) {
+            // Ocultar pantalla de inicio
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('final').style.display = 'none';
+            document.getElementById('historia').style.display = 'block';
+
+            // Crear indicador de progreso
+            const numFases = 2;
+            const faseActual = esInicio ? 1 : 2;
+            let progressHTML = '';
+            for (let i = 1; i <= numFases; i++) {
+                progressHTML += `<div class="progress-dot ${i <= faseActual ? 'active' : ''}"></div>`;
+            }
+            document.getElementById('progressIndicator').innerHTML = progressHTML;
+
+            // Crear contenido de la historia
+            let storyHTML = `<div class="story-text">${contenido.texto}</div>`;
+            storyHTML += '<div class="choices-container">';
+
+            contenido.opciones.forEach(opcion => {
+                storyHTML += `<button class="choice-btn" onclick="${opcion.accion}()" style="animation-delay: 0.1s;">
+                    ${opcion.texto}
+                </button>`;
+            });
+
+            storyHTML += '</div>';
+            document.getElementById('storyContent').innerHTML = storyHTML;
+
+            // Animación de entrada
+            setTimeout(() => {
+                const botones = document.querySelectorAll('.choice-btn');
+                botones.forEach((btn, index) => {
+                    btn.style.animation = `slideInUp 0.6s ease-out ${index * 0.1}s both`;
+                });
+            }, 100);
+        }
+
+        function mostrarFinal(final) {
+            // Ocultar historia
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('historia').style.display = 'none';
+            document.getElementById('final').style.display = 'block';
+
+            // Crear contenido del final
+            const tipoClase = final.tipo === 'positivo' ? 'final-positive' : 'final-negative';
+            let finalHTML = `<h2 class="final-title ${tipoClase}">${final.titulo}</h2>`;
+            finalHTML += final.contenido;
+            finalHTML += `<button class="btn-replay" onclick="reiniciarJuego()">🔄 Volver a Jugar</button>`;
+
+            document.getElementById('finalContent').innerHTML = finalHTML;
+
+            // Scroll al top suave
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function reiniciarJuego() {
+            // Resetear estado
+            estadoJuego = {
+                fase: 'inicio',
+                decision1: null,
+                decision2: null
+            };
+
+            // Mostrar pantalla de inicio
+            document.getElementById('inicio').style.display = 'block';
+            document.getElementById('historia').style.display = 'none';
+            document.getElementById('final').style.display = 'none';
+
+            // Scroll al top suave
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Inicializar en pantalla de inicio
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('inicio').style.display = 'block';
+            document.getElementById('historia').style.display = 'none';
+            document.getElementById('final').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
